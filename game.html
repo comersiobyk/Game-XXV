@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Adit The Game</title>
+
+<style>
+
+/* FONT */
+@font-face {
+    font-family: "TNR";
+    src: url("times new roman.ttf");
+}
+@font-face {
+    font-family: "TNR-Bold";
+    src: url("times new roman bold.ttf");
+}
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:url('bg.jpg') ;
+    background-size:cover;
+}
+
+.container{
+    max-width:420px;
+    margin:auto;
+    padding:10px;
+    position:relative;
+}
+
+/* CHAT */
+.chat{
+    background:white;
+    color:black;
+    padding:15px;
+    border-radius:20px;
+    border:2px solid #4da6ff;
+    min-height:130px;
+    font-family:"TNR";
+}
+
+.name{
+    font-weight:bold;
+    margin-bottom:6px;
+}
+.name.aliya{color:#4da6ff;}
+.name.cindy{color:#ff4d6d;}
+.name.tasya{color:#9b5de5;}
+
+.characters{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+}
+
+.char{
+    height:155px;
+}
+
+/* BUTTON */
+button{
+    width:100%;
+    margin:8px 0;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background:#ddd;
+    font-family:"TNR";
+}
+
+/* 🔥 MUSIC BUTTON */
+.music-btn{
+    position:absolute;
+    right:10px;
+    top:180px;
+    font-size:22px;
+    background:white;
+    border-radius:50%;
+    width:45px;
+    height:45px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="chat">
+    <div id="name" class="name"></div>
+    <div id="chat"></div>
+</div>
+
+<div class="characters">
+    <img src="MC.png" class="char">
+    <img id="charImg" class="char">
+</div>
+
+<!-- 🔥 MUSIC BUTTON -->
+<div class="music-btn" onclick="toggleMusic()">🎵</div>
+<audio id="bgm" src="music.mp3" loop></audio>
+
+<div id="choices"></div>
+<button id="nextBtn" style="display:none;">Lanjutkan</button>
+
+</div>
+
+<script>
+
+let score=0,current=0,sub=0
+
+const scenes=[
+
+// (SEMUA SCENE LU — GA DISENTUH SAMA SEKALI)
+{
+char:"Cewe 1.png",name:"Aliya",
+dialog:[
+"Aku mau cerita sesuatu...",
+"Aku tuh ngerasa kamu berubah banget akhir-akhir ini",
+"Kayak kamu masih ada… tapi ga bener-bener hadir",
+"Aku tiap malem mikir sendiri…",
+"Kamu sebenernya masih sayang aku ga sih?"
+],
+choices:[
+{text:"Perasaan kamu aja 😏",val:7},
+{text:"Maaf ya kalau bikin kamu ngerasa gitu",val:3},
+{text:"Ya emang",val:0}
+]
+},
+
+{
+char:"Cewe 2.png",name:"Cindy",
+dialog:[
+"Kamu tuh aneh tau ga sih...",
+"Suka ngilang tiba-tiba tanpa kabar",
+"Terus balik lagi kayak ga ada apa-apa",
+"Aku harus jadi siapa sih di hidup kamu?"
+],
+choices:[
+{text:"Santai aja lah 😏",val:7},
+{text:"Maaf ya, lagi banyak urusan",val:3},
+{text:"Ya terserah kamu",val:0}
+]
+},
+
+{
+char:"Cewe 3.png",name:"Tasya",
+dialog:[
+"Aku tadi liat kamu online lama banget...",
+"Tapi chat aku ga dibales sama sekali",
+"Aku mikir… kamu lagi sama siapa ya?",
+"Lucu sih… aku jadi overthinking sendiri"
+],
+choices:[
+{text:"Lagi sama temen 😏",val:7},
+{text:"Maaf ke-distract",val:3},
+{text:"Ya terus?",val:0}
+]
+},
+
+{
+char:"Cewe 1.png",name:"Aliya",
+dialog:[
+"Aku kangen...",
+"Tapi aku takut bilang kangen terus",
+"Soalnya aku ngerasa kamu ga kangen aku",
+"Aku doang yang ngerasa gini ya?"
+],
+choices:[
+{text:"Kangen banget 😏",val:7},
+{text:"Iya kangen kok",val:3},
+{text:"Biasa aja",val:0}
+]
+},
+
+{
+char:"Cewe 2.png",name:"Cindy",
+dialog:[
+"Jujur ya...",
+"Aku ngerasa aku bukan satu-satunya di hidup kamu",
+"Ada rasa kayak aku cuma pilihan kedua",
+"Aku salah ga sih ngerasa gini?"
+],
+choices:[
+{text:"Kamu doang kok 😏",val:7},
+{text:"Engga kok",val:3},
+{text:"Ya mungkin",val:0}
+]
+},
+
+{
+char:"Cewe 3.png",name:"Tasya",
+dialog:[
+"Aku takut kehilangan kamu...",
+"Tapi aku juga takut berharap terlalu jauh",
+"Takutnya aku yang jatuh sendirian",
+"Kamu bakal ninggalin aku ga?"
+],
+choices:[
+{text:"Ga mungkin 😏",val:7},
+{text:"Ga tau",val:3},
+{text:"Iya",val:0}
+]
+},
+
+{
+char:"Cewe 1.png",name:"Aliya",
+dialog:[
+"Kamu serius ga sih sama aku?",
+"Aku butuh kepastian, bukan janji doang"
+],
+choices:[
+{text:"Serius 😏",val:7},
+{text:"Jalanin aja dulu",val:3},
+{text:"Engga",val:0}
+]
+},
+
+{
+char:"Cewe 2.png",name:"Cindy",
+dialog:[
+"Kenapa kamu berubah?",
+"Dulu kamu ga kayak gini..."
+],
+choices:[
+{text:"Kamu aja yang berubah 😏",val:7},
+{text:"Ga berubah kok",val:3},
+{text:"Ya emang",val:0}
+]
+},
+
+{
+char:"Cewe 3.png",name:"Tasya",
+dialog:[
+"Aku penting ga buat kamu?",
+"Atau aku cuma pelengkap aja?"
+],
+choices:[
+{text:"Penting banget 😏",val:7},
+{text:"Penting kok",val:3},
+{text:"Biasa aja",val:0}
+]
+},
+
+{
+char:"Cewe 1.png",name:"Aliya",
+dialog:[
+"Kamu sekarang lagi dimana?",
+"Aku cuma pengen tau kamu baik-baik aja"
+],
+choices:[
+{text:"Di jalan 😏",val:7},
+{text:"Di rumah",val:3},
+{text:"Rahasia",val:0}
+]
+},
+
+{
+char:"Cewe 2.png",name:"Cindy",
+dialog:[
+"Kamu bakal ninggalin aku ga?",
+"Aku ga siap kalau harus sendirian lagi..."
+],
+choices:[
+{text:"Ga mungkin 😏",val:7},
+{text:"Ga tau",val:3},
+{text:"Mungkin",val:0}
+]
+},
+
+{
+char:"Cewe 3.png",name:"Tasya",
+dialog:[
+"Aku pengen ketemu kamu...",
+"Aku kangen banget sebenernya"
+],
+choices:[
+{text:"Gas 😏",val:7},
+{text:"Nanti ya",val:3},
+{text:"Males",val:0}
+]
+},
+
+{
+char:"Cewe 1.png",name:"Aliya",
+dialog:[
+"Aku lagi sedih...",
+"Tapi aku ga tau harus cerita ke siapa lagi"
+],
+choices:[
+{text:"Sini cerita 😏",val:7},
+{text:"Kenapa?",val:3},
+{text:"Oh",val:0}
+]
+},
+
+{
+char:"Cewe 2.png",name:"Cindy",
+dialog:[
+"Kamu sayang aku ga sih?",
+"Aku butuh jawaban jujur..."
+],
+choices:[
+{text:"Sayang 😏",val:7},
+{text:"Iya",val:3},
+{text:"Ga tau",val:0}
+]
+},
+
+{
+char:"Cewe 3.png",name:"Tasya",
+dialog:[
+"Aku jujur ya...",
+"Aku ngerasa aku bukan satu-satunya",
+"Tolong jujur ke aku..."
+],
+choices:[
+{text:"Iya 😏",val:7},
+{text:"Ya...",val:3},
+{text:"Engga",val:0}
+]
+}
+
+]
+
+const nameEl=document.getElementById("name")
+const chatEl=document.getElementById("chat")
+const charImg=document.getElementById("charImg")
+const choicesEl=document.getElementById("choices")
+const nextBtn=document.getElementById("nextBtn")
+
+const bgm = document.getElementById("bgm")
+let isPlaying = false
+
+function toggleMusic(){
+    if(isPlaying){
+        bgm.pause()
+        isPlaying=false
+    }else{
+        bgm.play()
+        isPlaying=true
+    }
+}
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5)}
+
+function setName(n){
+nameEl.className="name"
+if(n==="Aliya"){nameEl.innerText="Aliya 💙";nameEl.classList.add("aliya")}
+if(n==="Cindy"){nameEl.innerText="Cindy ❤️";nameEl.classList.add("cindy")}
+if(n==="Tasya"){nameEl.innerText="Tasya 💜";nameEl.classList.add("tasya")}
+}
+
+function load(){
+let s=scenes[current]
+
+charImg.src=s.char
+chatEl.innerText=s.dialog[sub]
+setName(s.name)
+
+choicesEl.innerHTML=""
+
+if(sub < s.dialog.length-1){
+nextBtn.style.display="block"
+}else{
+nextBtn.style.display="none"
+
+shuffle([...s.choices]).forEach(c=>{
+let btn=document.createElement("button")
+btn.innerText=c.text
+btn.onclick=()=>{score+=c.val;next()}
+choicesEl.appendChild(btn)
+})
+}
+}
+
+nextBtn.onclick=()=>{sub++;load()}
+
+function next(){
+current++;sub=0
+if(current>=scenes.length) end()
+else load()
+}
+
+function end(){
+let tier=""
+if(score<=39) tier="Ngga Jago"
+else if(score<=79) tier="Fakboy Pemula"
+else tier="Fakboy Kelas Atas"
+
+document.body.innerHTML=`
+<style>
+body{margin:0;background:url('bg.jpg') no-repeat center;background-size:cover;}
+.wrap{max-width:420px;margin:auto;padding:20px;}
+.panel{position:relative;}
+.panel img{width:100%;}
+.scoreLabel{position:absolute;top:58%;left:50%;transform:translateX(-50%);color:red ;font-family:"TNR-Bold";}
+.scoreVal{position:absolute;top:65%;left:50%;transform:translateX(-50%);color: red ;font-family:"TNR-Bold";}
+.titleLabel{position:absolute;top:74%;left:50%;transform:translateX(-50%);color:red ;font-family:"TNR-Bold";}
+.titleVal{position:absolute;top:81%;left:50%;transform:translateX(-50%);color:red ;font-family:"TNR-Bold";}
+</style>
+
+<div class="wrap">
+<div class="panel">
+<img src="Last.png">
+<div class="scoreLabel">Skor :</div>
+<div class="scoreVal">${score}</div>
+<div class="titleLabel">Title :</div>
+<div class="titleVal">${tier}</div>
+</div>
+</div>
+`
+}
+
+window.onload=load
+
+</script>
+
+</body>
+</html>
